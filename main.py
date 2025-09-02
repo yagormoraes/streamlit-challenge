@@ -1,6 +1,9 @@
-import streamlit as st
-import pandas as pd
+import time
 from datetime import datetime
+from pathlib import Path
+
+import pandas as pd
+import streamlit as st
 
 # =========================
 # Config & Tema
@@ -12,6 +15,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+# Tema com CSS
 st.markdown("""
     <style>
     :root {
@@ -39,6 +43,7 @@ def section(title: str, subtitle: str | None = None):
     st.markdown(f"<div class='section'><h2>{title}</h2></div>", unsafe_allow_html=True)
     if subtitle:
         st.caption(subtitle)
+
 # =========================
 # Estado Global
 # =========================
@@ -95,3 +100,31 @@ if show_data:
     q = q[q["valor"] >= min_v]
 
     st.dataframe(q, use_container_width=True)
+
+# =========================
+# Seção: Formulário e feedback
+# =========================
+section("Formulário", "Exemplo com validação simples")
+with st.form("contact"):
+    msg = st.text_area("Mensagem para o app", placeholder="Escreva algo legal…", height=110)
+    colb1, colb2 = st.columns([1,1])
+    with colb1:
+        urgent = st.checkbox("Marcar como urgente")
+    with colb2:
+        rating = st.slider("Satisfação", 1, 5, 4)
+    submitted = st.form_submit_button("Enviar")
+    if submitted:
+        if not msg.strip():
+            st.error("Por favor, escreva uma mensagem.")
+        else:
+            with st.spinner("Processando…"):
+                time.sleep(0.8)
+            st.success("Recebido! Obrigado 🙌")
+            st.toast(f"Mensagem do {username} registrada.", icon="✅")
+            st.write({"user": username, "urgent": urgent, "rating": rating, "text": msg[:100]})
+
+# =========================
+# Rodapé
+# =========================
+st.write("---")
+st.caption("Dia 1/30 • Base pronta para clonar nos próximos dias.")
